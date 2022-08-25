@@ -3,7 +3,7 @@ Description=tasmogy nous1 service
 
 [Service]
 Type=simple
-ExecStart=/home/joachim/miniconda3/envs/tasmogy/bin/python /home/joachim/bin/tasmogy.py nous1
+ExecStart=/home/joachim/bin/tasmogy.sh nous1
 User=joachim
 
 [Install]
