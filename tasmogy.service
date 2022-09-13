@@ -3,7 +3,7 @@ Description=tasmogy nous1 service
 
 [Service]
 Type=simple
-ExecStart=/home/joachim/bin/tasmogy.sh nous1
+ExecStart=/home/joachim/bin/tasmogy.sh nous1 nous3
 User=joachim
 
 [Install]

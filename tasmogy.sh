@@ -1,4 +1,4 @@
 #!/bin/bash
-. ~/.profile
+. ~/.bashrc
 conda activate tasmogy
-python ~/bin/tasmogy.py $1
+exec python -u ~/bin/tasmogy.py $@
