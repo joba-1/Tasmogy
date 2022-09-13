@@ -15,11 +15,12 @@ The script is used by a systemd service so the script does its job whenever the 
 * adapt username and hostname of energy device in service file (and optionally the hostname of a fan power switch)
 * create conda environment "tasmogy" with python, requests and paho-mqtt
 * create influx database "energies"
-* start service
-	systemctl daemon-reload
-	systemctl enable tasmogy
-	systemctl start tasmogy
-
+* start service as root / with sudo
+```
+systemctl daemon-reload
+systemctl enable tasmogy
+systemctl start tasmogy
+```
 ## Use
 
 As soon as tasmota device has energy readings with ApparentPower != 0.0 it will create entries in influx db measurement "energy".
