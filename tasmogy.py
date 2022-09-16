@@ -104,42 +104,45 @@ def on_connect(mqtt_client, userdata, flags, rc):
 
 
 def on_message(mqtt_client, userdata, msg):
-    if fanSwitch is not None and msg.topic == mqtt_fan_state:
-        # message is a fan status
-        payload = msg.payload.decode("utf-8")
-        fanSwitch.fan_state(payload == "ON")
-        return
+    try:
+        if fanSwitch is not None and msg.topic == mqtt_fan_state:
+            # message is a fan status
+            payload = msg.payload.decode("utf-8")
+            fanSwitch.fan_state(payload == "ON")
+            return
 
-    # message is a sensor status
-    data = json.loads(msg.payload.decode("utf-8"))
-    energy = data["StatusSNS"]["ENERGY"]
-    payload = f"{influx_measurements},device={power_device}"
-    sep=" " 
-    global no_power
-    power = None
-    for key, value in energy.items():
-        if key == "ApparentPower":
-            if value == 0.0:
-                if no_power:
-                    return
+        # message is a sensor status
+        data = json.loads(msg.payload.decode("utf-8"))
+        energy = data["StatusSNS"]["ENERGY"]
+        payload = f"{influx_measurements},device={power_device}"
+        sep=" " 
+        global no_power
+        power = None
+        for key, value in energy.items():
+            if key == "ApparentPower":
+                if value == 0.0:
+                    if no_power:
+                        return
+                    else:
+                        no_power = True
                 else:
-                    no_power = True
-            else:
-                no_power = False
-        elif key == "Power":
-            power = int(value)
-        if type(value) == type(""):
-            value = f'"{value}"'
-        payload += f"{sep}{key}={value}"
-        sep=","
+                    no_power = False
+            elif key == "Power":
+                power = int(value)
+            if type(value) == type(""):
+                value = f'"{value}"'
+            payload += f"{sep}{key}={value}"
+            sep=","
 
-    response = requests.post(url=influx_url, data=payload)
-    if response.status_code < 200 or response.status_code > 299:
-        print(f"influx {influx_host} code {response.status_code} for '{response.text}' with '{payload}'")
+        response = requests.post(url=influx_url, data=payload)
+        if response.status_code < 200 or response.status_code > 299:
+            print(f"influx {influx_host} code {response.status_code} for '{response.text}' with '{payload}'")
 
-    if power is not None and fanSwitch is not None:
-        fanSwitch.handle_power(power)
-        
+        if power is not None and fanSwitch is not None:
+            fanSwitch.handle_power(power)
+    except UnicodeDecodeError:
+        pass  # not interested...
+    
 
 def mqtt_request():
     mqtt_client.publish(mqtt_request_topic, mqtt_request_message)
