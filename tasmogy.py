@@ -140,6 +140,8 @@ def on_message(mqtt_client, userdata, msg):
 
         if power is not None and fanSwitch is not None:
             fanSwitch.handle_power(power)
+    except requests.exceptions.ConnectionError as e:
+        print(f"Influx connect error '{str(e)}'")  # try again later
     except UnicodeDecodeError:
         pass  # not interested...
     
