@@ -35,10 +35,15 @@ def process_line(line, nr):
         return False  # invalid json
 
     try:
+        # STATUS10 message
         energy = data["StatusSNS"]["ENERGY"]
     except KeyError:
-        print(f"Key Error for '{data}'")
-        return False  # not an energy reading
+        try:
+            # SENSOR message
+            energy = data["ENERGY"]
+        except KeyError:
+            print(f"Key Error for '{data}'")
+            return False  # not an energy reading
 
     payload = f"{influx_measurements},device={tasmota_device}"
     sep=" "
@@ -77,3 +82,4 @@ if __name__ == "__main__":
             insert_count += 1
 
     print(f"Inserted {insert_count} of {line_count} lines into {influx_db}.{influx_measurements}@{influx_host}")
+
